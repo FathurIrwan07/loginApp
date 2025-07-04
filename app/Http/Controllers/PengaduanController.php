@@ -34,7 +34,7 @@ class PengaduanController extends Controller
             'kategori' => $request->kategori,
             'deskripsi' => $request->deskripsi,
             'bukti' => $buktiPath,
-            'status' => 'Menunggu Tindakan',
+            'status' => 'Menunggu konfirmasi',
             'tanggal' => now(),
             'kode_pengaduan' => 'PGD-' . strtoupper(Str::random(6)),
         ]);

@@ -2,28 +2,43 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class AdminController extends Controller
 {
     public function dashboard()
     {
-        $totalUsers = User::count();
-        $adminUsers = User::where('role', 'admin')->count();
-        $regularUsers = User::where('role', 'user')->count();
-
-        return view('admin.dashboard', compact('totalUsers', 'adminUsers', 'regularUsers'));
+        return view('admin.dashboard');
     }
 
-    public function users()
+    public function logout(Request $request)
     {
-        $users = User::latest()->paginate(10);
-        return view('admin.users', compact('users'));
+        if (!Auth::check()) {
+            return redirect('/');
+        }
+
+        $this->_logout($request);
+
+        return redirect('/')->with('success', 'Anda telah logout.');
     }
 
-    public function settings()
+    /*************  ✨ Windsurf Command ⭐  *************/
+    /**
+     * Perform the actual logout action.
+     *
+     * This function is called by the logout() function in this class.
+     *
+     * @param Request $request
+     */
+    /*******  c394c1bb-02f6-493a-9415-11451e166028  *******/
+    public function _logout(Request $request)
     {
-        return view('admin.settings');
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
     }
+
+
 }

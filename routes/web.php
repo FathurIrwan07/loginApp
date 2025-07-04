@@ -1,50 +1,74 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PengaduanController;
+use App\Http\Controllers\AdminPengaduansController;
+use App\Http\Controllers\UserPengaduansController;
 
+// ==========================
+// HOME / WELCOME
+// ==========================
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Route untuk redirect setelah login - HAPUS 'verified' middleware
+// ==========================
+// REDIRECT SETELAH LOGIN
+// ==========================
 Route::get('/dashboard', function () {
     if (auth()->user()->isAdmin()) {
         return redirect()->route('admin.dashboard');
-    } else {
-        return redirect()->route('user.dashboard');
     }
-})->middleware(['auth'])->name('dashboard'); // PERUBAHAN: Hapus 'verified'
+    return redirect()->route('user.dashboard');
+})->middleware(['auth'])->name('dashboard');
 
-// Route untuk Admin
-Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('/admin/users', [AdminController::class, 'users'])->name('admin.users');
-    Route::get('/admin/settings', [AdminController::class, 'settings'])->name('admin.settings');
+// ==========================
+// ADMIN ROUTES
+// ==========================
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
+
+    // CRUD untuk pengaduan
+    Route::resource('pengaduans', AdminPengaduansController::class);
+
+    // Konfirmasi status pengaduan (terima/tolak)
+    Route::put('/pengaduans/{id}/konfirmasi', [AdminPengaduansController::class, 'konfirmasi'])->name('pengaduans.konfirmasi');
+
 });
 
-// Route untuk User biasa
-Route::middleware(['auth', 'user'])->group(function () {
-    Route::get('/user/dashboard', [UserController::class, 'dashboard'])->name('user.dashboard');
-    Route::get('/user/profile', [UserController::class, 'profile'])->name('user.profile');
+// ==========================
+// USER ROUTES
+// ==========================
+Route::middleware(['auth', 'user'])->prefix('user')->name('user.')->group(function () {
+    Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
+    Route::get('/profile', [UserController::class, 'profile'])->name('profile');
 });
 
-// Route untuk profile (bisa diakses semua user yang login)
+// ==========================
+// PROFILE (Umum)
+// ==========================
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/pengaduan/create', [PengaduanController::class, 'create'])->name('pengaduan.create');
-    Route::post('/pengaduan', [PengaduanController::class, 'store'])->name('pengaduan.store');
-    Route::get('/pengaduan/history', [PengaduanController::class, 'history'])->name('pengaduan.history');
-    Route::get('/pengaduan/status', [PengaduanController::class, 'status'])->name('pengaduan.status');
+// ==========================
+// PENGADUAN (User)
+// ==========================
+Route::middleware('auth')->prefix('pengaduan')->name('pengaduan.')->group(function () {
+    Route::get('/create', [PengaduanController::class, 'create'])->name('create');
+    Route::post('/', [PengaduanController::class, 'store'])->name('store');
+    Route::get('/history', [PengaduanController::class, 'history'])->name('history');
+    Route::get('/status', [PengaduanController::class, 'status'])->name('status');
 });
 
-
-require __DIR__.'/auth.php';
+// ==========================
+// AUTH ROUTES
+// ==========================
+require __DIR__ . '/auth.php';
