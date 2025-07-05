@@ -63,14 +63,14 @@
 
 
 
-    <li class="nav-item">
+    <!-- <li class="nav-item">
         <a class="nav-link" href="/berkasproses">
             <i class="fas fa-fw fa-folder"></i>
             <span>Berkas di Proses</span>
         </a>
-    </li>
+    </li> -->
 
-    <li class="nav-item">
+    <!-- <li class="nav-item">
         <a class="nav-link" href="/berkasselesai">
             <i class="fas fa-fw fa-folder"></i>
             <span>Berkas Selesai</span>
@@ -82,7 +82,7 @@
             <i class="fas fa-fw fa-folder"></i>
             <span>Berkas Ditolak</span>
         </a>
-    </li>
+    </li> -->
 
 
 
